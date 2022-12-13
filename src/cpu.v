@@ -119,6 +119,15 @@ module control (
 				// Byte 1 is the register code to write to
 				// Byte 2 is the register code to write from
 				S_CPFR = 9'h108,
+				// Store register to memory
+				/**
+				 * Note that there is no "store immediate".
+				 * This is because there's no good way to implement it
+				 * without adding dedicated "instruction argument" registers.
+				 */
+				// Byte 1 is the register code to write from
+				// Byte 2 is the memory address to write to
+				S_STOM = 9'h109,
 				S_ZZZZ = 9'h1ff; // dummy instruction to make diffs look nicer
 
 	// state table
@@ -145,6 +154,7 @@ module control (
 			S_LDFI: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
 			S_LDFR: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
 			S_CPFR: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
+			S_STOM: if (m_current_cycle == 4) m_next_state = S_INC_RIP;
 		endcase
 	end
 
@@ -370,6 +380,32 @@ module control (
 					// 4. Load register from register from RAM output
 					o_select = i_ram_in;
 					o_load_reg = m_reg_select;
+				end
+			end
+			S_STOM: begin
+				if (m_current_cycle == 0) begin
+					// 1. Increment instruction pointer
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 1) begin
+					// 2. Wait for RAM
+					// Also increment RIP again while waiting
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 2) begin
+					// 3. Choose register based on RAM output
+					m_next_reg_select = i_ram_in;
+					m_load_reg_select = 1'b1;
+				end else if (m_current_cycle == 3) begin
+					// 4. Load address from RAM output
+					o_select = `SEL_RAM;
+					o_load_addr = 1'b1;
+				end else begin
+					// 5. Write RAM from register
+					o_select = m_reg_select;
+					o_write_ram = 1'b1;
 				end
 			end
 		endcase
