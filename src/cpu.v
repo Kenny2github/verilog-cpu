@@ -60,7 +60,6 @@ module control (
 	input wire i_load_addr,
 	input wire i_load_data,
 	input wire i_execute,
-	// input wire i_take_input,
 	input wire i_input_taken,
 	input wire [7:0] i_ram_in,
 	output reg [4:0] o_select,
@@ -255,12 +254,10 @@ module datapath (
 	input wire i_load_alu,
 	input wire i_write_ram,
 	input wire [7:0] i_load_reg,
-	// output wire o_take_input,
 	output wire [7:0] o_ram_out
 );
 				// memory address register
 	reg [7:0]   m_MAR,
-				m_MDR,
 				// instruction pointer
 				m_RIP,
 				// arithmetic accumulator
@@ -322,7 +319,6 @@ module datapath (
 	always @(posedge i_clk) begin
 		if (i_reset) begin
 			m_MAR <= 8'b0;
-			m_MDR <= 8'b0;
 			m_RIP <= 8'b0;
 			m_RAX <= 8'b0;
 			m_RFL <= 8'b0;
@@ -337,7 +333,6 @@ module datapath (
 		end
 		else begin
 			if (i_load_addr) m_MAR <= bus;
-			// if (i_load_data | i_write_ram) m_MDR <= bus;
 			if (i_load_rip) m_RIP <= bus;
 			if (i_load_alu) begin
 				m_RAX <= m_alu_out;
