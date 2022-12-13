@@ -144,6 +144,9 @@ module control (
 				// Jump if the ALU less than flag is set
 				// Byte 1 is the memory address to jump to
 				S_JILT = 9'h10c,
+				// Jump if the ALU flags equals and less than are not set
+				// Byte 1 is the memory address to jump to
+				S_JIGT = 9'h10d,
 				S_ZZZZ = 9'h1ff; // dummy instruction to make diffs look nicer
 
 	// state table
@@ -179,6 +182,12 @@ module control (
 			end
 			S_JILT: begin
 				if (m_current_cycle == 0 && !i_alu_flags[`LESS_THAN_BIT]) m_next_state = S_INC_RIP;
+				else if (m_current_cycle == 2) m_next_state = S_FETCH;
+			end
+			S_JIGT: begin
+				if (m_current_cycle == 0 && (
+					i_alu_flags[`LESS_THAN_BIT] || i_alu_flags[`EQUAL_BIT]
+				)) m_next_state = S_INC_RIP;
 				else if (m_current_cycle == 2) m_next_state = S_FETCH;
 			end
 		endcase
@@ -441,7 +450,7 @@ module control (
 					o_write_ram = 1'b1;
 				end
 			end
-			S_JINZ, S_JIEQ, S_JILT: begin
+			S_JINZ, S_JIEQ, S_JILT, S_JIGT: begin
 				if (m_current_cycle == 0) begin
 					// 1. Get RAM data at RIP + 1
 					o_select = `SEL_RIP_1;
