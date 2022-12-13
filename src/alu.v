@@ -12,7 +12,7 @@ module alu (
 	output wire o_zero,
 	output wire o_one,
 	output wire o_overflow,
-	output wire o_undefined
+	output reg o_undefined
 );
 	assign o_equal = (i_A == i_B);
 	assign o_less_than = (i_A < i_B);
