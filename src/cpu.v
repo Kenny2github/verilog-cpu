@@ -122,17 +122,13 @@ module control (
 			S_LOAD_ADDR_WAIT: if (!i_load_addr) m_next_state = S_LOAD_DATA;
 			S_LOAD_DATA: if (i_load_data) m_next_state = S_LOAD_DATA_WAIT;
 			S_LOAD_DATA_WAIT: if (!i_load_data) m_next_state = S_LOAD_ADDR;
-			// S_WRITE_RAM: m_next_state = S_LOAD_ADDR;
 			S_PRE_EXECUTE: if (!i_execute) m_next_state = S_FETCH;
-			// wait until cycle 2 to let RAM catch up
 			S_FETCH: if (m_current_cycle == 2) m_next_state = 9'b1_0000_0000 | {1'b0, i_ram_in};
-			// wait until cycle 2 to let RAM catch up
 			S_INC_RIP: if (m_current_cycle == 2) m_next_state = 9'b1_0000_0000 | {1'b0, i_ram_in};
 			S_HALT: m_next_state = S_LOAD_ADDR;
 			S_NOOP: m_next_state = S_INC_RIP;
 			S_WRIM: if (m_current_cycle >= 3) if (i_input_taken) m_next_state = S_WRIM_WAIT;
 			S_WRIM_WAIT: if (!i_input_taken) m_next_state = S_INC_RIP;
-			// wait until cycle 2 to let RAM catch up
 			S_JUMP: if (m_current_cycle == 2) m_next_state = S_FETCH;
 			S_MATH: if (m_current_cycle == 2) m_next_state = S_INC_RIP;
 			S_LDFM: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
