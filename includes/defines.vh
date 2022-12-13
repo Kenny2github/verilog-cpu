@@ -51,6 +51,35 @@
 `define MATH_NOT	7'h0b
 // Two's complement
 `define MATH_NEG	7'h0c
+// Left shift
+`define MATH_LSHIFT	7'h0d
+// Right shift
+`define MATH_RSHIFT	7'h0e
+// Logical (inclusive) OR
+`define MATH_LIOR	7'h0f
+// Logical AND
+`define MATH_LAND	7'h10
+// Logical XOR
+`define MATH_LXOR	7'h11
+// Logical NOR
+`define MATH_LNOR	7'h12
+// Logical NAND
+`define MATH_LNAND	7'h13
+// Logical exclusive NOR
+`define MATH_LXNOR	7'h14
+// Logical NOT
+`define MATH_LNOT	7'h15
+// Unary (inclusive) OR
+`define MATH_UIOR	7'h16
+`define MATH_NZERO	7'h16
+// Unary AND
+`define MATH_UAND	7'h17
+`define MATH_ONES	7'h17
+// Unary XOR
+`define MATH_UXOR	7'h18
+`define MATH_PARITY	7'h18
+// Return A and set flags
+`define MATH_CMP	7'h7f
 
 // ALU flag bits
 `define CARRY_OUT_BIT	0

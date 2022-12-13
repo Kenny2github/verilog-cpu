@@ -60,6 +60,60 @@ run 100ps
 force {i_op} 7'h0c
 run 100ps
 
+# MATH_LSHIFT
+force {i_B} 8'd1
+force {i_op} 7'h0d
+run 100ps
+
+# MATH_RSHIFT
+force {i_op} 7'h0e
+run 100ps
+
+# MATH_LIOR
+force {i_B} 8'd0
+force {i_op} 7'h0f
+run 100ps
+
+# MATH_LAND
+force {i_op} 7'h10
+run 100ps
+
+# MATH_LXOR
+force {i_op} 7'h11
+run 100ps
+
+# MATH_LNOR
+force {i_op} 7'h12
+run 100ps
+
+# MATH_LNAND
+force {i_op} 7'h13
+run 100ps
+
+# MATH_LXNOR
+force {i_op} 7'h14
+run 100ps
+
+# MATH_LNOT
+force {i_op} 7'h15
+run 100ps
+
+# MATH_UIOR
+force {i_op} 7'h16
+run 100ps
+
+# MATH_UAND
+force {i_op} 7'h17
+run 100ps
+
+# MATH_UXOR
+force {i_op} 7'h18
+run 100ps
+
+# MATH_CMP
+force {i_op} 7'h7f
+run 100ps
+
 # test no carry out (carry out tested in ADD)
 force {i_A} 8'b01011011
 force {i_B} 8'b00100100

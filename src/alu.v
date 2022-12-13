@@ -37,6 +37,19 @@ module alu (
 			`MATH_XNOR: o_G = ~(i_A ^ i_B);
 			`MATH_NOT: o_G = ~i_A;
 			`MATH_NEG: o_G = -i_A;
+			`MATH_LSHIFT: o_G = i_A << i_B;
+			`MATH_RSHIFT: o_G = i_A >> i_B;
+			`MATH_LIOR: o_G = i_A || i_B;
+			`MATH_LAND: o_G = i_A && i_B;
+			`MATH_LXOR: o_G = (|{i_A}) ^ (|{i_B});
+			`MATH_LNOR: o_G = !(i_A || i_B);
+			`MATH_LNAND: o_G = !(i_A && i_B);
+			`MATH_LXNOR: o_G = !((|{i_A}) ^ (|{i_B}));
+			`MATH_LNOT: o_G = !i_A;
+			`MATH_UIOR: o_G = |{i_A};
+			`MATH_UAND: o_G = &{i_A};
+			`MATH_UXOR: o_G = ^{i_A};
+			`MATH_CMP: o_G = i_A;
 			default: o_G = 8'b0;
 		endcase
 	end
