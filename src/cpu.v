@@ -18,7 +18,7 @@ module cpu (
 			m_load_alu,
 			m_write_ram;
 	wire [4:0] m_select;
-	wire [7:0] m_ram, m_load_reg;
+	wire [7:0] m_ram, m_load_reg, m_alu_flags;
 	assign o_data_out = m_ram;
 
 	control u_control(
@@ -29,6 +29,7 @@ module cpu (
 		.i_execute(i_execute),
 		.i_input_taken(i_input_taken),
 		.i_ram_in(m_ram),
+		.i_alu_flags(m_alu_flags),
 		.o_select(m_select),
 		.o_load_addr(m_load_addr),
 		.o_load_data(m_load_data),
@@ -50,6 +51,7 @@ module cpu (
 		.i_load_alu(m_load_alu),
 		.i_write_ram(m_write_ram),
 		.i_load_reg(m_load_reg),
+		.o_alu_flags(m_alu_flags),
 		.o_ram_out(m_ram)
 	);
 endmodule
@@ -62,6 +64,7 @@ module control (
 	input wire i_execute,
 	input wire i_input_taken,
 	input wire [7:0] i_ram_in,
+	input wire [7:0] i_alu_flags,
 	output reg [4:0] o_select,
 	output reg o_load_addr,
 	output reg o_load_data,
@@ -447,6 +450,7 @@ module datapath (
 	input wire i_load_alu,
 	input wire i_write_ram,
 	input wire [7:0] i_load_reg,
+	output wire [7:0] o_alu_flags,
 	output wire [7:0] o_ram_out
 );
 				// memory address register
@@ -461,6 +465,7 @@ module datapath (
 				m_REG4, m_REG5, m_REG6, m_REG7;
 	wire [7:0] m_ram_out;
 	assign o_ram_out = m_ram_out;
+	assign o_alu_flags = m_RFL;
 
 	reg [7:0] bus;
 
