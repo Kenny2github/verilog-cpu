@@ -16,6 +16,7 @@ module cpu (
 			m_load_data,
 			m_load_rip,
 			m_load_alu,
+			m_load_rax,
 			m_write_ram;
 	wire [4:0] m_select;
 	wire [7:0] m_ram, m_load_reg, m_alu_flags;
@@ -35,6 +36,7 @@ module cpu (
 		.o_load_data(m_load_data),
 		.o_load_rip(m_load_rip),
 		.o_load_alu(m_load_alu),
+		.o_load_rax(m_load_rax),
 		.o_write_ram(m_write_ram),
 		.o_waiting(o_waiting),
 		.o_take_input(o_take_input),
@@ -49,6 +51,7 @@ module cpu (
 		.i_load_data(m_load_data),
 		.i_load_rip(m_load_rip),
 		.i_load_alu(m_load_alu),
+		.i_load_rax(m_load_rax),
 		.i_write_ram(m_write_ram),
 		.i_load_reg(m_load_reg),
 		.o_alu_flags(m_alu_flags),
@@ -70,6 +73,7 @@ module control (
 	output reg o_load_data,
 	output reg o_load_rip,
 	output reg o_load_alu,
+	output reg o_load_rax,
 	output reg o_write_ram,
 	output reg o_waiting,
 	output reg o_take_input,
@@ -186,6 +190,7 @@ module control (
 		o_load_data = 1'b0;
 		o_load_rip = 1'b0;
 		o_load_alu = 1'b0;
+		o_load_rax = 1'b0;
 		o_write_ram = 1'b0;
 		o_waiting = 1'b0;
 		o_select = `SEL_D_IN;
@@ -284,16 +289,7 @@ module control (
 					o_load_addr = 1'b1;
 				end else if (m_current_cycle == 2) begin
 					// 3. Choose register based on RAM output
-					case (i_ram_in)
-						`SEL_REG0: m_next_reg_select[0] = 1'b1;
-						`SEL_REG1: m_next_reg_select[1] = 8'b1;
-						`SEL_REG2: m_next_reg_select[2] = 8'b1;
-						`SEL_REG3: m_next_reg_select[3] = 8'b1;
-						`SEL_REG4: m_next_reg_select[4] = 8'b1;
-						`SEL_REG5: m_next_reg_select[5] = 8'b1;
-						`SEL_REG6: m_next_reg_select[6] = 8'b1;
-						`SEL_REG7: m_next_reg_select[7] = 8'b1;
-					endcase
+					m_next_reg_select = i_ram_in;
 					m_load_reg_select = 1'b1;
 				end else if (m_current_cycle == 3) begin
 					// 4. Load address from RAM output
@@ -304,7 +300,17 @@ module control (
 				end else begin
 					// 6. Write RAM to register
 					o_select = `SEL_RAM;
-					o_load_reg = m_reg_select;
+					case (m_reg_select)
+						`SEL_REG0: o_load_reg[0] = 1'b1;
+						`SEL_REG1: o_load_reg[1] = 1'b1;
+						`SEL_REG2: o_load_reg[2] = 1'b1;
+						`SEL_REG3: o_load_reg[3] = 1'b1;
+						`SEL_REG4: o_load_reg[4] = 1'b1;
+						`SEL_REG5: o_load_reg[5] = 1'b1;
+						`SEL_REG6: o_load_reg[6] = 1'b1;
+						`SEL_REG7: o_load_reg[7] = 1'b1;
+						`SEL_RAX: o_load_rax = 1'b1;
+					endcase
 				end
 			end
 			S_LDFI: begin
@@ -321,21 +327,22 @@ module control (
 					o_load_addr = 1'b1;
 				end else if (m_current_cycle == 2) begin
 					// 3. Choose register based on RAM output
-					case (i_ram_in)
-						`SEL_REG0: m_next_reg_select = 8'h01;
-						`SEL_REG1: m_next_reg_select = 8'h02;
-						`SEL_REG2: m_next_reg_select = 8'h04;
-						`SEL_REG3: m_next_reg_select = 8'h08;
-						`SEL_REG4: m_next_reg_select = 8'h10;
-						`SEL_REG5: m_next_reg_select = 8'h20;
-						`SEL_REG6: m_next_reg_select = 8'h40;
-						`SEL_REG7: m_next_reg_select = 8'h80;
-					endcase
+					m_next_reg_select = i_ram_in;
 					m_load_reg_select = 1'b1;
 				end else begin
 					// 4. Write RAM to register
 					o_select = `SEL_RAM;
-					o_load_reg = m_reg_select;
+					case (m_reg_select)
+						`SEL_REG0: o_load_reg[0] = 1'b1;
+						`SEL_REG1: o_load_reg[1] = 1'b1;
+						`SEL_REG2: o_load_reg[2] = 1'b1;
+						`SEL_REG3: o_load_reg[3] = 1'b1;
+						`SEL_REG4: o_load_reg[4] = 1'b1;
+						`SEL_REG5: o_load_reg[5] = 1'b1;
+						`SEL_REG6: o_load_reg[6] = 1'b1;
+						`SEL_REG7: o_load_reg[7] = 1'b1;
+						`SEL_RAX: o_load_rax = 1'b1;
+					endcase
 				end
 			end
 			S_LDFR: begin
@@ -352,16 +359,7 @@ module control (
 					o_load_addr = 1'b1;
 				end else if (m_current_cycle == 2) begin
 					// 3. Choose register based on RAM output
-					case (i_ram_in)
-						`SEL_REG0: m_next_reg_select[0] = 1'b1;
-						`SEL_REG1: m_next_reg_select[1] = 8'b1;
-						`SEL_REG2: m_next_reg_select[2] = 8'b1;
-						`SEL_REG3: m_next_reg_select[3] = 8'b1;
-						`SEL_REG4: m_next_reg_select[4] = 8'b1;
-						`SEL_REG5: m_next_reg_select[5] = 8'b1;
-						`SEL_REG6: m_next_reg_select[6] = 8'b1;
-						`SEL_REG7: m_next_reg_select[7] = 8'b1;
-					endcase
+					m_next_reg_select = i_ram_in;
 					m_load_reg_select = 1'b1;
 				end else if (m_current_cycle == 3) begin
 					// 4. Load address from register from RAM output
@@ -372,7 +370,17 @@ module control (
 				end else begin
 					// 6. Write RAM to register
 					o_select = `SEL_RAM;
-					o_load_reg = m_reg_select;
+					case (m_reg_select)
+						`SEL_REG0: o_load_reg[0] = 1'b1;
+						`SEL_REG1: o_load_reg[1] = 1'b1;
+						`SEL_REG2: o_load_reg[2] = 1'b1;
+						`SEL_REG3: o_load_reg[3] = 1'b1;
+						`SEL_REG4: o_load_reg[4] = 1'b1;
+						`SEL_REG5: o_load_reg[5] = 1'b1;
+						`SEL_REG6: o_load_reg[6] = 1'b1;
+						`SEL_REG7: o_load_reg[7] = 1'b1;
+						`SEL_RAX: o_load_rax = 1'b1;
+					endcase
 				end
 			end
 			S_CPFR: begin
@@ -389,21 +397,22 @@ module control (
 					o_load_addr = 1'b1;
 				end else if (m_current_cycle == 2) begin
 					// 3. Choose register based on RAM output
-					case (i_ram_in)
-						`SEL_REG0: m_next_reg_select[0] = 1'b1;
-						`SEL_REG1: m_next_reg_select[1] = 8'b1;
-						`SEL_REG2: m_next_reg_select[2] = 8'b1;
-						`SEL_REG3: m_next_reg_select[3] = 8'b1;
-						`SEL_REG4: m_next_reg_select[4] = 8'b1;
-						`SEL_REG5: m_next_reg_select[5] = 8'b1;
-						`SEL_REG6: m_next_reg_select[6] = 8'b1;
-						`SEL_REG7: m_next_reg_select[7] = 8'b1;
-					endcase
+					m_next_reg_select = i_ram_in;
 					m_load_reg_select = 1'b1;
 				end else begin
 					// 4. Load register from register from RAM output
 					o_select = i_ram_in;
-					o_load_reg = m_reg_select;
+					case (m_reg_select)
+						`SEL_REG0: o_load_reg[0] = 1'b1;
+						`SEL_REG1: o_load_reg[1] = 1'b1;
+						`SEL_REG2: o_load_reg[2] = 1'b1;
+						`SEL_REG3: o_load_reg[3] = 1'b1;
+						`SEL_REG4: o_load_reg[4] = 1'b1;
+						`SEL_REG5: o_load_reg[5] = 1'b1;
+						`SEL_REG6: o_load_reg[6] = 1'b1;
+						`SEL_REG7: o_load_reg[7] = 1'b1;
+						`SEL_RAX: o_load_rax = 1'b1;
+					endcase
 				end
 			end
 			S_STOM: begin
@@ -483,6 +492,7 @@ module datapath (
 	input wire i_load_data,
 	input wire i_load_rip,
 	input wire i_load_alu,
+	input wire i_load_rax,
 	input wire i_write_ram,
 	input wire [7:0] i_load_reg,
 	output wire [7:0] o_alu_flags,
@@ -571,6 +581,7 @@ module datapath (
 				m_RAX <= m_alu_out;
 				m_RFL <= m_alu_flags;
 			end
+			if (i_load_rax) m_RAX <= bus;
 			if (i_load_reg[0]) m_REG0 <= bus;
 			if (i_load_reg[1]) m_REG1 <= bus;
 			if (i_load_reg[2]) m_REG2 <= bus;

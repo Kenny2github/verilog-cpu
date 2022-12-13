@@ -9,7 +9,7 @@
 `define SEL_REG5	5'h05
 `define SEL_REG6	5'h06
 `define SEL_REG7	5'h07
-// Arithmetic accumulator - read only
+// Arithmetic accumulator - read/write
 `define SEL_RAX		5'h08
 // Instruction pointer - read only
 `define SEL_RIP		5'h09
