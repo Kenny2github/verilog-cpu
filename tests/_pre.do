@@ -1,10 +1,10 @@
 vlib work
 vlog -incr +incdir+../includes ../src/cpu.v ../src/ram.v ../src/alu.v
 vsim -L altera_mf_ver cpu
-log {/cpu/*}
+# log {/cpu/*}
 log {/cpu/u_control/*}
 log {/cpu/u_datapath/*}
-add wave -radix unsigned {/cpu/*}
+# add wave -radix unsigned {/cpu/*}
 add wave -radix hexadecimal {/cpu/u_control/*}
 add wave -radix hexadecimal {/cpu/u_datapath/*}
 
