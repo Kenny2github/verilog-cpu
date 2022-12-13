@@ -159,10 +159,8 @@ module control (
 			S_WRIM_WAIT: if (!i_input_taken) m_next_state = S_INC_RIP;
 			S_JUMP: if (m_current_cycle == 2) m_next_state = S_FETCH;
 			S_MATH: if (m_current_cycle == 2) m_next_state = S_INC_RIP;
-			S_LDFM: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
-			S_LDFI: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
-			S_LDFR: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
-			S_CPFR: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
+			S_LDFM, S_LDFR: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
+			S_LDFI, S_CPFR: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
 			S_STOM: if (m_current_cycle == 4) m_next_state = S_INC_RIP;
 			S_JINZ: begin
 				if (m_current_cycle == 0 && i_alu_flags[`ZERO_BIT]) m_next_state = S_INC_RIP;
