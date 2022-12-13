@@ -1,5 +1,5 @@
 vlib work
-vlog -incr +incdir+../includes ../src/cpu.v ../src/ram.v ../src/alu.v
+vlog -incr +incdir+../../includes ../../src/cpu.v ../../src/ram.v ../../src/alu.v
 vsim -L altera_mf_ver cpu
 # log {/cpu/*}
 log {/cpu/u_control/*}
