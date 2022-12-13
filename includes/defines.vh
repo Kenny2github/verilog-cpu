@@ -88,5 +88,6 @@
 `define ZERO_BIT		3
 `define ONE_BIT			4
 `define OVERFLOW_BIT	5
+`define UNDEFINED_BIT	6
 
 `endif

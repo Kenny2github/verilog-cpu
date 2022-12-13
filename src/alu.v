@@ -11,7 +11,8 @@ module alu (
 	output wire o_less_than,
 	output wire o_zero,
 	output wire o_one,
-	output wire o_overflow
+	output wire o_overflow,
+	output wire o_undefined
 );
 	assign o_equal = (i_A == i_B);
 	assign o_less_than = (i_A < i_B);
@@ -23,12 +24,19 @@ module alu (
 
 	always @(*) begin
 		o_carry_out = 1'b0;
+		o_undefined = 1'b0;
 		case (i_op)
 			`MATH_ADD: {o_carry_out, o_G} = i_A + i_B;
 			`MATH_SUB: {o_carry_out, o_G} = i_A - i_B;
 			`MATH_MUL: o_G = i_A * i_B;
-			`MATH_DIV: o_G = i_A / i_B;
-			`MATH_MOD: o_G = i_A % i_B;
+			`MATH_DIV: begin
+				o_G = i_A / i_B;
+				o_undefined = (i_B == 8'b0);
+			end
+			`MATH_MOD: begin
+				o_G = i_A % i_B;
+				o_undefined = (i_B == 8'b0);
+			end
 			`MATH_IOR: o_G = i_A | i_B;
 			`MATH_AND: o_G = i_A & i_B;
 			`MATH_XOR: o_G = i_A ^ i_B;

@@ -535,9 +535,10 @@ module datapath (
 		.o_less_than(m_alu_flags[`LESS_THAN_BIT]),
 		.o_zero(m_alu_flags[`ZERO_BIT]),
 		.o_one(m_alu_flags[`ONE_BIT]),
-		.o_overflow(m_alu_flags[`OVERFLOW_BIT])
+		.o_overflow(m_alu_flags[`OVERFLOW_BIT]),
+		.o_undefined(m_alu_flags[`UNDEFINED_BIT])
 	);
-	assign m_alu_flags[7:6] = 2'b0;
+	assign m_alu_flags[7] = 1'b0;
 
 	always @(*) begin
 		case (i_select)
