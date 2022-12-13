@@ -1,3 +1,4 @@
+# Usage: do provide_input.do <1-byte hex I/O input>
 when -label halt {
 	/cpu/u_control/m_current_state = 9'h000
 	and /cpu/u_control/m_current_cycle = 3'd1
@@ -13,11 +14,14 @@ when -label wrim {
 	echo Run `do provide_input.do <1-byte hex>` to continue.
 }
 
+force {i_data_in} 8'h$1
 run 1ns
-force {i_execute} 1
+force {i_input_taken} 1
 run 1ns
-force {i_execute} 0
+force {i_input_taken} 0
 run -all
 
 nowhen halt
 nowhen wrim
+
+do ../utils/_post.do
