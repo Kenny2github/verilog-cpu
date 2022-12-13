@@ -131,6 +131,9 @@ module control (
 				// Byte 1 is the register code to write from
 				// Byte 2 is the memory address to write to
 				S_STOM = 9'h109,
+				// Jump if the ALU zero flag is not set
+				// Byte 1 is the memory address to jump to
+				S_JINZ = 9'h10a,
 				S_ZZZZ = 9'h1ff; // dummy instruction to make diffs look nicer
 
 	// state table
@@ -158,6 +161,10 @@ module control (
 			S_LDFR: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
 			S_CPFR: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
 			S_STOM: if (m_current_cycle == 4) m_next_state = S_INC_RIP;
+			S_JINZ: begin
+				if (m_current_cycle == 0 && i_alu_flags[`ZERO_BIT]) m_next_state = S_INC_RIP;
+				else if (m_current_cycle == 2) m_next_state = S_FETCH;
+			end
 		endcase
 	end
 
@@ -411,6 +418,22 @@ module control (
 					// 5. Write RAM from register
 					o_select = m_reg_select;
 					o_write_ram = 1'b1;
+				end
+			end
+			S_JINZ: begin
+				if (m_current_cycle == 0) begin
+					// 1. Get RAM data at RIP + 1
+					o_select = `SEL_RIP_1;
+					o_load_addr = 1'b1;
+					o_load_rip = 1'b1;
+				end else if (m_current_cycle == 1) begin
+					// 2. Wait for RAM
+					// This will never be reached if zero
+					// is set (see state table)
+				end else begin
+					// 3. Set instruction pointer to that data
+					o_select = `SEL_RAM;
+					o_load_rip = 1'b1;
 				end
 			end
 		endcase
