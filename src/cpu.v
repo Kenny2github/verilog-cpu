@@ -525,8 +525,8 @@ module datapath (
 	wire [7:0] m_alu_out, m_alu_flags;
 
 	alu u_ALU0(
-		.i_A(m_REG0),
-		.i_B(m_REG1),
+		.i_A(m_RAX),
+		.i_B(m_REG0),
 		.i_signed(m_ram_out[7]),
 		.i_op(m_ram_out[6:0]),
 		.o_G(m_alu_out),
