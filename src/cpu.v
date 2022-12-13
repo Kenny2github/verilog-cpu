@@ -147,6 +147,9 @@ module control (
 				// Jump if the ALU flags equals and less than are not set
 				// Byte 1 is the memory address to jump to
 				S_JIGT = 9'h10d,
+				// Pause to let the user see the data at the specified addr
+				// Byte 1 is the memory address to show
+				S_SHOM = 9'h10e,
 				S_ZZZZ = 9'h1ff; // dummy instruction to make diffs look nicer
 
 	// state table
@@ -190,6 +193,7 @@ module control (
 				)) m_next_state = S_INC_RIP;
 				else if (m_current_cycle == 2) m_next_state = S_FETCH;
 			end
+			S_SHOM: if (m_current_cycle >= 3) if (i_input_taken) m_next_state = S_WRIM_WAIT;
 		endcase
 	end
 
@@ -234,7 +238,6 @@ module control (
 				o_load_addr = 1'b1;
 			end
 			S_WRIM: begin
-				o_take_input = 1'b1;
 				if (m_current_cycle == 0) begin
 					// 1. Increment instruction pointer
 					// (We could just set MAR, but then that would require
@@ -464,6 +467,25 @@ module control (
 					// 3. Set instruction pointer to that data
 					o_select = `SEL_RAM;
 					o_load_rip = 1'b1;
+				end
+			end
+			S_SHOM: begin
+				if (m_current_cycle == 0) begin
+					// 1. Increment instruction pointer
+					// (We could just set MAR, but then that would require
+					// incrementing RIP twice after taking input)
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 1) begin
+					// 2. Wait for RAM
+				end else if (m_current_cycle == 2) begin
+					// 3. Load address from RAM
+					o_select = `SEL_RAM;
+					o_load_addr = 1'b1;
+				end else begin
+					// 4. Indicate that we're waiting for a continue
+					o_take_input = 1'b1;
 				end
 			end
 		endcase
