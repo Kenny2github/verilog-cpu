@@ -267,7 +267,8 @@ module datapath (
 				m_RAX,
 				// ALU flags register
 				m_RFL;
-	reg [7:0] m_REG[0:7];
+	reg [7:0]	m_REG0, m_REG1, m_REG2, m_REG3,
+				m_REG4, m_REG5, m_REG6, m_REG7;
 	wire [7:0] m_ram_out;
 	assign o_ram_out = m_ram_out;
 
@@ -284,8 +285,8 @@ module datapath (
 	wire [7:0] m_alu_out, m_alu_flags;
 
 	alu u_ALU0(
-		.i_A(m_REG[0]),
-		.i_B(m_REG[1]),
+		.i_A(m_REG0),
+		.i_B(m_REG1),
 		.i_signed(m_ram_out[7]),
 		.i_op(m_ram_out[6:0]),
 		.o_G(m_alu_out),
@@ -300,14 +301,14 @@ module datapath (
 
 	always @(*) begin
 		case (i_select)
-			`SEL_REG0: bus = m_REG[0];
-			`SEL_REG1: bus = m_REG[1];
-			`SEL_REG2: bus = m_REG[2];
-			`SEL_REG3: bus = m_REG[3];
-			`SEL_REG4: bus = m_REG[4];
-			`SEL_REG5: bus = m_REG[5];
-			`SEL_REG6: bus = m_REG[6];
-			`SEL_REG7: bus = m_REG[7];
+			`SEL_REG0: bus = m_REG0;
+			`SEL_REG1: bus = m_REG1;
+			`SEL_REG2: bus = m_REG2;
+			`SEL_REG3: bus = m_REG3;
+			`SEL_REG4: bus = m_REG4;
+			`SEL_REG5: bus = m_REG5;
+			`SEL_REG6: bus = m_REG6;
+			`SEL_REG7: bus = m_REG7;
 			`SEL_D_IN: bus = i_data_in;
 			`SEL_RAX: bus = m_RAX;
 			`SEL_RAM: bus = m_ram_out;
@@ -325,14 +326,14 @@ module datapath (
 			m_RIP <= 8'b0;
 			m_RAX <= 8'b0;
 			m_RFL <= 8'b0;
-			m_REG[0] <= 8'b0;
-			m_REG[1] <= 8'b0;
-			m_REG[2] <= 8'b0;
-			m_REG[3] <= 8'b0;
-			m_REG[4] <= 8'b0;
-			m_REG[5] <= 8'b0;
-			m_REG[6] <= 8'b0;
-			m_REG[7] <= 8'b0;
+			m_REG0 <= 8'b0;
+			m_REG1 <= 8'b0;
+			m_REG2 <= 8'b0;
+			m_REG3 <= 8'b0;
+			m_REG4 <= 8'b0;
+			m_REG5 <= 8'b0;
+			m_REG6 <= 8'b0;
+			m_REG7 <= 8'b0;
 		end
 		else begin
 			if (i_load_addr) m_MAR <= bus;
@@ -342,14 +343,14 @@ module datapath (
 				m_RAX <= m_alu_out;
 				m_RFL <= m_alu_flags;
 			end
-			if (i_load_reg[0]) m_REG[0] <= bus;
-			if (i_load_reg[1]) m_REG[1] <= bus;
-			if (i_load_reg[2]) m_REG[2] <= bus;
-			if (i_load_reg[3]) m_REG[3] <= bus;
-			if (i_load_reg[4]) m_REG[4] <= bus;
-			if (i_load_reg[5]) m_REG[5] <= bus;
-			if (i_load_reg[6]) m_REG[6] <= bus;
-			if (i_load_reg[7]) m_REG[7] <= bus;
+			if (i_load_reg[0]) m_REG0 <= bus;
+			if (i_load_reg[1]) m_REG1 <= bus;
+			if (i_load_reg[2]) m_REG2 <= bus;
+			if (i_load_reg[3]) m_REG3 <= bus;
+			if (i_load_reg[4]) m_REG4 <= bus;
+			if (i_load_reg[5]) m_REG5 <= bus;
+			if (i_load_reg[6]) m_REG6 <= bus;
+			if (i_load_reg[7]) m_REG7 <= bus;
 		end
 	end
 endmodule
