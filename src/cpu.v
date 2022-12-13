@@ -103,13 +103,18 @@ module control (
 				// whether the operands are signed
 				S_MATH = 9'h104,
 				// Load register from memory
-				// Byte 1 is the register code
-				// Byte 2 is the memory address
+				// Byte 1 is the register code to write to
+				// Byte 2 is the memory address to fetch from
 				S_LDFM = 9'h105,
 				// Load register from immediate
-				// Byte 1 is the register code
-				// Byte 2 is the immediate value
-				S_LDFI = 9'h106;
+				// Byte 1 is the register code to write to
+				// Byte 2 is the immediate value to write
+				S_LDFI = 9'h106,
+				// Load register from register memory address
+				// Byte 1 is the register code to write to
+				// Byte 2 is the register code
+				// containing the memory address to fetch from
+				S_LDFR = 9'h107;
 
 	// state table
 	always @(*) begin
@@ -133,6 +138,7 @@ module control (
 			S_MATH: if (m_current_cycle == 2) m_next_state = S_INC_RIP;
 			S_LDFM: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
 			S_LDFI: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
+			S_LDFR: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
 		endcase
 	end
 
@@ -288,6 +294,43 @@ module control (
 					m_load_reg_select = 1'b1;
 				end else begin
 					// 4. Write RAM to register
+					o_select = `SEL_RAM;
+					o_load_reg = m_reg_select;
+				end
+			end
+			S_LDFR: begin
+				if (m_current_cycle == 0) begin
+					// 1. Increment instruction pointer
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 1) begin
+					// 2. Wait for RAM
+					// Also increment RIP again while waiting
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 2) begin
+					// 3. Choose register based on RAM output
+					case (i_ram_in)
+						`SEL_REG0: m_next_reg_select[0] = 1'b1;
+						`SEL_REG1: m_next_reg_select[1] = 8'b1;
+						`SEL_REG2: m_next_reg_select[2] = 8'b1;
+						`SEL_REG3: m_next_reg_select[3] = 8'b1;
+						`SEL_REG4: m_next_reg_select[4] = 8'b1;
+						`SEL_REG5: m_next_reg_select[5] = 8'b1;
+						`SEL_REG6: m_next_reg_select[6] = 8'b1;
+						`SEL_REG7: m_next_reg_select[7] = 8'b1;
+					endcase
+					m_load_reg_select = 1'b1;
+				end else if (m_current_cycle == 3) begin
+					// 4. Load address from register from RAM output
+					o_select = i_ram_in;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 4) begin
+					// 5. Wait for RAM
+				end else begin
+					// 6. Write RAM to register
 					o_select = `SEL_RAM;
 					o_load_reg = m_reg_select;
 				end
