@@ -75,6 +75,9 @@ module control (
 	reg [8:0] m_next_state, m_current_state;
 	reg [2:0] m_current_cycle;
 
+	reg [7:0] m_reg_select, m_next_reg_select;
+	reg m_load_reg_select;
+
 	localparam  S_LOAD_ADDR = 9'h000,
 				S_LOAD_ADDR_WAIT = 9'h001,
 				S_LOAD_DATA = 9'h002,
@@ -98,7 +101,15 @@ module control (
 				// Arithmetic operation
 				// Byte 1 is the operation, where the MSB indicates
 				// whether the operands are signed
-				S_MATH = 9'h104;
+				S_MATH = 9'h104,
+				// Load register from memory
+				// Byte 1 is the register code
+				// Byte 2 is the memory address
+				S_LDFM = 9'h105,
+				// Load register from immediate
+				// Byte 1 is the register code
+				// Byte 2 is the immediate value
+				S_LDFI = 9'h106;
 
 	// state table
 	always @(*) begin
@@ -124,6 +135,8 @@ module control (
 			// wait until cycle 2 to let RAM catch up
 			S_JUMP: if (m_current_cycle == 2) m_next_state = S_FETCH;
 			S_MATH: if (m_current_cycle == 2) m_next_state = S_INC_RIP;
+			S_LDFM: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
+			S_LDFI: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
 		endcase
 	end
 
@@ -138,6 +151,8 @@ module control (
 		o_select = `SEL_D_IN;
 		o_take_input = 1'b0;
 		o_load_reg = 8'b0;
+		m_load_reg_select = 1'b0;
+		m_next_reg_select = 8'b0;
 
 		case (m_current_state)
 			S_LOAD_ADDR: begin
@@ -213,6 +228,74 @@ module control (
 					o_load_alu = 1'b1;
 				end
 			end
+			S_LDFM: begin
+				if (m_current_cycle == 0) begin
+					// 1. Increment instruction pointer
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 1) begin
+					// 2. Wait for RAM
+					// Also increment RIP again while waiting
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 2) begin
+					// 3. Choose register based on RAM output
+					case (i_ram_in)
+						`SEL_REG0: m_next_reg_select[0] = 1'b1;
+						`SEL_REG1: m_next_reg_select[1] = 8'b1;
+						`SEL_REG2: m_next_reg_select[2] = 8'b1;
+						`SEL_REG3: m_next_reg_select[3] = 8'b1;
+						`SEL_REG4: m_next_reg_select[4] = 8'b1;
+						`SEL_REG5: m_next_reg_select[5] = 8'b1;
+						`SEL_REG6: m_next_reg_select[6] = 8'b1;
+						`SEL_REG7: m_next_reg_select[7] = 8'b1;
+					endcase
+					m_load_reg_select = 1'b1;
+				end else if (m_current_cycle == 3) begin
+					// 4. Load address from RAM output
+					o_select = `SEL_RAM;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 4) begin
+					// 5. Wait for RAM
+				end else begin
+					// 6. Write RAM to register
+					o_select = `SEL_RAM;
+					o_load_reg = m_reg_select;
+				end
+			end
+			S_LDFI: begin
+				if (m_current_cycle == 0) begin
+					// 1. Increment instruction pointer
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 1) begin
+					// 2. Wait for RAM
+					// Also increment RIP again while waiting
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 2) begin
+					// 3. Choose register based on RAM output
+					case (i_ram_in)
+						`SEL_REG0: m_next_reg_select = 8'h01;
+						`SEL_REG1: m_next_reg_select = 8'h02;
+						`SEL_REG2: m_next_reg_select = 8'h04;
+						`SEL_REG3: m_next_reg_select = 8'h08;
+						`SEL_REG4: m_next_reg_select = 8'h10;
+						`SEL_REG5: m_next_reg_select = 8'h20;
+						`SEL_REG6: m_next_reg_select = 8'h40;
+						`SEL_REG7: m_next_reg_select = 8'h80;
+					endcase
+					m_load_reg_select = 1'b1;
+				end else begin
+					// 4. Write RAM to register
+					o_select = `SEL_RAM;
+					o_load_reg = m_reg_select;
+				end
+			end
 		endcase
 	end
 
@@ -221,6 +304,7 @@ module control (
 		if (i_reset) begin
 			m_current_state <= S_LOAD_ADDR;
 			m_current_cycle <= 3'b0;
+			m_reg_select <= 8'b0;
 		end
 		else begin
 			if (m_current_state == m_next_state) begin
@@ -233,6 +317,7 @@ module control (
 				m_current_cycle <= 3'b0;
 			end
 			m_current_state <= m_next_state;
+			if (m_load_reg_select) m_reg_select <= m_next_reg_select;
 		end
 	end
 endmodule
