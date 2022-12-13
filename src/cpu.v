@@ -225,8 +225,10 @@ module control (
 					// 1. Get RAM data at RIP + 1
 					o_select = `SEL_RIP_1;
 					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 1) begin
+					// 2. Wait for RAM
 				end else begin
-					// 2. Set instruction pointer to that data
+					// 3. Set instruction pointer to that data
 					o_select = `SEL_RAM;
 					o_load_rip = 1'b1;
 				end
