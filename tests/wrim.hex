@@ -2,7 +2,7 @@
 // instance=/cpu/u_datapath/u_MEM0/altsyncram_component/m_default/altsyncram_inst/mem_data
 // format=hex addressradix=h dataradix=h version=1.0 wordsperline=25
 // write input to addr 02, which will then be executed
- @0 02 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ @0 02 02 ff 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 @19 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 @32 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 @4b 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
