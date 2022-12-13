@@ -478,12 +478,12 @@ module datapath (
 		.i_signed(m_ram_out[7]),
 		.i_op(m_ram_out[6:0]),
 		.o_G(m_alu_out),
-		.o_carry_out(m_alu_flags[0]),
-		.o_equal(m_alu_flags[1]),
-		.o_less_than(m_alu_flags[2]),
-		.o_zero(m_alu_flags[3]),
-		.o_one(m_alu_flags[4]),
-		.o_overflow(m_alu_flags[5])
+		.o_carry_out(m_alu_flags[`CARRY_OUT_BIT]),
+		.o_equal(m_alu_flags[`EQUAL_BIT]),
+		.o_less_than(m_alu_flags[`LESS_THAN_BIT]),
+		.o_zero(m_alu_flags[`ZERO_BIT]),
+		.o_one(m_alu_flags[`ONE_BIT]),
+		.o_overflow(m_alu_flags[`OVERFLOW_BIT])
 	);
 	assign m_alu_flags[7:6] = 2'b0;
 

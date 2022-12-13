@@ -1,6 +1,6 @@
 `ifndef SEL_REG0
 
-// Registers 0 to 7
+// Registers 0 to 7 - read/write
 `define SEL_REG0	5'h00
 `define SEL_REG1	5'h01
 `define SEL_REG2	5'h02
@@ -9,10 +9,12 @@
 `define SEL_REG5	5'h05
 `define SEL_REG6	5'h06
 `define SEL_REG7	5'h07
-// Arithmetic accumulator
+// Arithmetic accumulator - read only
 `define SEL_RAX		5'h08
-// Instruction pointer
+// Instruction pointer - read only
 `define SEL_RIP		5'h09
+// ALU flags register - read only
+`define SEL_RFL		5'h0a
 /* The above double as 4-bit register codes */
 // Instruction pointer + 1
 `define SEL_RIP_1	5'h10
@@ -49,5 +51,13 @@
 `define MATH_NOT	7'h0b
 // Two's complement
 `define MATH_NEG	7'h0c
+
+// ALU flag bits
+`define CARRY_OUT_BIT	0
+`define EQUAL_BIT		1
+`define LESS_THAN_BIT	2
+`define ZERO_BIT		3
+`define ONE_BIT			4
+`define OVERFLOW_BIT	5
 
 `endif
