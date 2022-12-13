@@ -123,6 +123,7 @@ module control (
 			S_WRIM_WAIT: if (!i_input_taken) m_next_state = S_INC_RIP;
 			// wait until cycle 2 to let RAM catch up
 			S_JUMP: if (m_current_cycle == 2) m_next_state = S_FETCH;
+			S_MATH: if (m_current_cycle == 2) m_next_state = S_INC_RIP;
 		endcase
 	end
 
@@ -205,18 +206,11 @@ module control (
 					o_load_addr = 1'b1;
 				end else if (m_current_cycle == 1) begin
 					// 2. Wait for RAM
-				end else if (m_current_cycle == 2) begin
+				end else begin
 					// 3. Write ALU output
+					// ALU opcode is always from RAM output
+					// RAX and RFL are always set by ALU output
 					o_load_alu = 1'b1;
-				end else if (m_current_cycle == 3) begin
-					// 4. Increment again
-					o_select = `SEL_RIP_1;
-					o_load_rip = 1'b1;
-					o_load_addr = 1'b1;
-				end else if (m_current_cycle == 4) begin
-					// 5. Wait for RAM
-				end else if (m_current_cycle == 5) begin
-					// 6.
 				end
 			end
 		endcase
