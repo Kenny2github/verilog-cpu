@@ -49,7 +49,7 @@ run 10ns
 force {i_execute} 1
 run 1ns
 force {i_execute} 0
-run 10ns
+run 8ns
 
 # cleanup
 do _post.do
