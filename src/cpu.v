@@ -118,7 +118,8 @@ module control (
 				// Load register from register
 				// Byte 1 is the register code to write to
 				// Byte 2 is the register code to write from
-				S_CPFR = 9'h108;
+				S_CPFR = 9'h108,
+				S_ZZZZ = 9'h1ff; // dummy instruction to make diffs look nicer
 
 	// state table
 	always @(*) begin
