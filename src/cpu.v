@@ -449,8 +449,8 @@ module control (
 					o_load_rip = 1'b1;
 				end else if (m_current_cycle == 1) begin
 					// 2. Wait for RAM
-					// This will never be reached if zero
-					// is set (see state table)
+					// This will never be reached if condition
+					// not met (see state table)
 				end else begin
 					// 3. Set instruction pointer to that data
 					o_select = `SEL_RAM;
