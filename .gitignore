@@ -3,3 +3,9 @@ vsim.wlf
 work/
 .vs*
 *tmp
+*dump.txt
+db/
+incremental_db/
+output_files/
+simulation/
+*.qws
