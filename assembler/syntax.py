@@ -43,7 +43,7 @@ _MathOp = Literal['ADD', 'SUB', 'MUL', 'DIV', 'MOD', 'IOR', 'AND', 'XOR', 'NOR',
 
 @dataclass
 class MathOp:
-    _item_1: InitVar[Literal['@']]
+    sign: Literal['+', '-']
     _item_2: InitVar[Commit]
     op: _MathOp
 

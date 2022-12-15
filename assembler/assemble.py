@@ -132,7 +132,10 @@ def mkbytes(text: str) -> bytes:
             addr_arg = resolve_addr(item.addr, labels)
             data = bytes([SINGLE_ADDR_INSTS[type(item)], addr_arg])
         elif isinstance(item, MATH):
-            data = bytes([0x04, MATH_OPS[item.op.op]])
+            op = MATH_OPS[item.op.op]
+            if item.op.sign == '-':
+                op |= 0x80
+            data = bytes([0x04, op])
         elif isinstance(item, Load):
             item = item.inst
             # don't actually have to care about which mnemonic was used

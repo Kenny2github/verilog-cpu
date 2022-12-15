@@ -49,7 +49,7 @@ immediate: '$' ~ NO_SPACE value=number
 regmem[RegMem]: '[' reg=ro_reg ']'
 ro_reg[ROReg]: '%' ~ name=(r'reg[0-7]' | 'rax' | 'rfl' | 'rip')
 register: '%' ~ name=(r'reg[0-7]' | 'rax')
-math_op: '@' ~ op=_math_op
+math_op: sign=('+' | '-') ~ op=_math_op
 _math_op[_MathOp]:
 	| 'ADD'
 	| 'SUB'
