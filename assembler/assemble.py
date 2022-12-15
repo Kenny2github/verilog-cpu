@@ -97,6 +97,9 @@ def mkbytes(text: str) -> bytes:
     labels: dict[str, int] = {}
     addr: int = 0
     for item in assembly.instructions:
+        item = item.inst
+        if item is None:
+            continue # purely comment line
         if isinstance(item, Label):
             labels[item.name] = addr
             continue
@@ -109,6 +112,9 @@ def mkbytes(text: str) -> bytes:
     memory = bytearray(256)
     addr = 0
     for item in assembly.instructions:
+        item = item.inst
+        if item is None:
+            continue # purely comment line
         if isinstance(item, Label):
             continue # we can ignore these now
         if isinstance(item, Data):

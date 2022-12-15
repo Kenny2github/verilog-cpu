@@ -1,4 +1,10 @@
-start[Assembly]: instructions=instruction_or_label+ ENDMARKER
+start[Assembly]: instructions=line+ ENDMARKER
+
+line[Line]:
+	| inst=instruction_or_label NEWLINE
+	| inst=instruction_or_label? comment NEWLINE
+
+comment[Comment]: ';' ~ r'.*'
 
 instruction_or_label[InstLabel]: instruction | label | data
 

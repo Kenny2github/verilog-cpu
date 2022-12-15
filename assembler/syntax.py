@@ -215,8 +215,27 @@ Instruction = Union[HALT, NOOP, WRIM, JUMP, MATH, Load, Store, JINZ, JIEQ, JILT,
 InstLabel = Union[Instruction, Label, Data]
 
 @dataclass
+class Comment:
+    _item_1: InitVar[Literal[';']]
+    _item_2: InitVar[Commit]
+    _item_3: InitVar[Regex[str, r""".*"""]]
+
+@dataclass
+class Line_1:
+    inst: InstLabel
+    _item_2: InitVar[NEWLINE]
+
+@dataclass
+class Line_2:
+    inst: Optional[InstLabel]
+    _item_2: InitVar[Comment]
+    _item_3: InitVar[NEWLINE]
+
+Line = Union[Line_1, Line_2]
+
+@dataclass
 class Assembly:
-    instructions: Annotated[list[InstLabel], "+"]
+    instructions: Annotated[list[Line], "+"]
     _item_2: InitVar[ENDMARKER]
 
 def parse(text: str) -> Assembly:
