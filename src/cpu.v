@@ -583,6 +583,7 @@ module datapath (
 			`SEL_REG7: bus = m_REG7;
 			`SEL_D_IN: bus = i_data_in;
 			`SEL_RAX: bus = m_RAX;
+			`SEL_RFL: bus = m_RFL;
 			`SEL_RAM: bus = m_ram_out;
 			`SEL_RIP: bus = m_RIP;
 			`SEL_RIP_1: bus = m_RIP + 8'b1;
