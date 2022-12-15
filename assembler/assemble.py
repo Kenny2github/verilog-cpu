@@ -1,5 +1,5 @@
 from typing_extensions import assert_never
-from .lexer import *
+from .syntax import *
 
 INST_LENGTHS = {
     HALT: 1,
