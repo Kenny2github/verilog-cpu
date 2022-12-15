@@ -1,0 +1,91 @@
+start[Assembly]: instructions=instruction_or_label+ ENDMARKER
+
+instruction_or_label[InstLabel]: instruction | label | data
+
+instruction[Instruction]:
+	| i_halt
+	| i_noop
+	| i_read
+	| i_jump
+	| i_math
+	| i_load
+	| i_store
+	| i_jinz
+	| i_jieq
+	| i_jilt
+	| i_jigt
+	| i_show
+data[Data]: 'data' addr=memaddr ':' bytes=number+
+
+# individual instructions' grammars
+i_halt[HALT]: inst=('halt' | 'HALT')
+i_noop[NOOP]: inst=('noop' | 'NOOP')
+i_read[WRIM]: ('read' | 'WRIM') addr=memaddr
+i_jump[JUMP]: ('jump' | 'JUMP') addr=memaddr
+i_math[MATH]: ('math' | 'MATH') op=math_op
+i_load[Load]: inst=_i_load
+_i_load[_Load]:
+	| mnemonic='load' reg=register '<-' arg=read_arg
+	| mnemonic='load' arg=read_arg '->' reg=register
+	| mnemonic='LDFM' reg=register '<-' arg=memaddr
+	| mnemonic='LDFI' reg=register '<-' arg=immediate
+	| mnemonic='LDFR' reg=register '<-' arg=regmem
+	| mnemonic='CPFR' reg=register '<-' arg=ro_reg
+i_store[Store]: inst=_i_store
+_i_store[_Store]:
+	| mnemonic='store' arg=memaddr '<-' reg=ro_reg
+	| mnemonic='store' reg=ro_reg '->' arg=memaddr
+	| mnemonic='STOM' reg=ro_reg '->' arg=memaddr
+i_jinz[JINZ]: ('jinz' | 'JINZ') addr=memaddr
+i_jieq[JIEQ]: ('jieq' | 'JIEQ') addr=memaddr
+i_jilt[JILT]: ('jilt' | 'JILT') addr=memaddr
+i_jigt[JIGT]: ('jigt' | 'JIGT') addr=memaddr
+i_show[SHOM]: ('show' | 'SHOM') addr=memaddr
+
+# instruction arguments
+read_arg: immediate | ro_reg | regmem | dereference
+dereference: '[' addr=memaddr ']'
+immediate: '$' ~ NO_SPACE value=number
+regmem[RegMem]: '[' reg=ro_reg ']'
+ro_reg[ROReg]: '%' ~ name=(r'reg[0-7]' | 'rax' | 'rfl' | 'rip')
+register: '%' ~ name=(r'reg[0-7]' | 'rax')
+math_op: '@' ~ op=_math_op
+_math_op[_MathOp]:
+	| 'ADD'
+	| 'SUB'
+	| 'MUL'
+	| 'DIV'
+	| 'MOD'
+	| 'IOR'
+	| 'AND'
+	| 'XOR'
+	| 'NOR'
+	| 'NAND'
+	| 'XNOR'
+	| 'NOT'
+	| 'NEG'
+	| 'LSHIFT'
+	| 'RSHIFT'
+	| 'LIOR'
+	| 'LAND'
+	| 'LXOR'
+	| 'LNOR'
+	| 'LNAND'
+	| 'LXNOR'
+	| 'LNOT'
+	| 'UIOR'
+	| 'NZERO'
+	| 'UAND'
+	| 'ONES'
+	| 'UXOR'
+	| 'PARITY'
+	| 'CMP'
+
+# mini-grammar for static memory address arithmetic
+memaddr[MemAddr]: additive | product | atom
+additive: arg1=additive op=('+' | '-') arg2=product
+product: arg1=product op='*' arg2=atom
+atom: number | parenthesized | label
+number: r"0x[0-9a-fA-F]+" | r"(0d)?[0-9]+" | r"0b[01]+" | r"0o[0-7]+"
+parenthesized: '(' ~ value=memaddr ')'
+label[Label]: ':' NO_SPACE name=NAME
