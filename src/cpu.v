@@ -108,6 +108,8 @@ module control (
 				// Arithmetic operation
 				// Byte 1 is the operation, where the MSB indicates
 				// whether the operands are signed
+				// Byte 2 is the register code for the 2nd operand
+				// (the 1st operand is always RAX)
 				S_MATH = 9'h104,
 				// Load register from memory
 				// Byte 1 is the register code to write to
@@ -171,9 +173,8 @@ module control (
 			S_WRIM: if (m_current_cycle >= 3) if (i_input_taken) m_next_state = S_WRIM_WAIT;
 			S_WRIM_WAIT: if (!i_input_taken) m_next_state = S_INC_RIP;
 			S_JUMP: if (m_current_cycle == 2) m_next_state = S_FETCH;
-			S_MATH: if (m_current_cycle == 2) m_next_state = S_INC_RIP;
 			S_LDFM, S_LDFR: if (m_current_cycle == 5) m_next_state = S_INC_RIP;
-			S_LDFI, S_CPFR: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
+			S_MATH, S_LDFI, S_CPFR: if (m_current_cycle == 3) m_next_state = S_INC_RIP;
 			S_STOM: if (m_current_cycle == 4) m_next_state = S_INC_RIP;
 			S_JINZ: begin
 				if (m_current_cycle == 0 && i_alu_flags[`ZERO_BIT]) m_next_state = S_INC_RIP;
@@ -280,10 +281,19 @@ module control (
 					o_load_addr = 1'b1;
 				end else if (m_current_cycle == 1) begin
 					// 2. Wait for RAM
+					// Also increment RIP again while waiting
+					o_select = `SEL_RIP_1;
+					o_load_rip = 1'b1;
+					o_load_addr = 1'b1;
+				end else if (m_current_cycle == 2) begin
+					// 3. Choose register based on RAM output
+					m_next_reg_select = i_ram_in;
+					m_load_reg_select = 1'b1;
 				end else begin
-					// 3. Write ALU output
+					// 4. Choose register and write ALU output
 					// ALU opcode is always from RAM output
 					// RAX and RFL are always set by ALU output
+					o_select = m_reg_select;
 					o_load_alu = 1'b1;
 				end
 			end
@@ -557,7 +567,7 @@ module datapath (
 
 	alu u_ALU0(
 		.i_A(m_RAX),
-		.i_B(m_REG0),
+		.i_B(bus),
 		.i_signed(m_ram_out[7]),
 		.i_op(m_ram_out[6:0]),
 		.o_G(m_alu_out),

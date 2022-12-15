@@ -28,7 +28,10 @@ i_halt[HALT]: inst=('halt' | 'HALT')
 i_noop[NOOP]: inst=('noop' | 'NOOP')
 i_read[WRIM]: ('read' | 'WRIM') addr=memaddr
 i_jump[JUMP]: ('jump' | 'JUMP') addr=memaddr
-i_math[MATH]: ('math' | 'MATH') op=math_op
+i_math[MATH]: inst=_i_math
+_i_math[_MATH]:
+	| mnemonic='math' op=math_op arg=ro_reg
+	| mnemonic='MATH' arg=ro_reg op=math_op
 i_load[Load]: inst=_i_load
 _i_load[_Load]:
 	| mnemonic='load' reg=register '<-' arg=read_arg

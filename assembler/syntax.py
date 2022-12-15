@@ -181,9 +181,22 @@ class Load:
     inst: _Load
 
 @dataclass
-class MATH:
-    _item_1: InitVar[Literal['math', 'MATH']]
+class _MATH_1:
+    mnemonic: Literal['math']
     op: MathOp
+    arg: ROReg
+
+@dataclass
+class _MATH_2:
+    mnemonic: Literal['MATH']
+    arg: ROReg
+    op: MathOp
+
+_MATH = Union[_MATH_1, _MATH_2]
+
+@dataclass
+class MATH:
+    inst: _MATH
 
 @dataclass
 class JUMP:
