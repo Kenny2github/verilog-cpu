@@ -6,7 +6,7 @@ module top (
 	output wire [6:0] HEX0,
 	output wire [6:0] HEX1,
 	output wire [6:0] HEX2,
-	output wire [6:0] HEX3,
+	output wire [6:0] HEX3
 );
 	wire [7:0] m_data_out;
 
